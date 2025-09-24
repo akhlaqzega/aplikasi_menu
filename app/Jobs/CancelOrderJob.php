@@ -28,8 +28,9 @@ class CancelOrderJob implements ShouldQueue
         if ($order && $order->status === 'pending') {
             $order->status = 'canceled';
             $order->save();
-            
+
             Session::forget('pending_order_id');
+            // 
         }
     }
 }
