@@ -30,7 +30,7 @@ class CancelOrderJob implements ShouldQueue
             $order->save();
 
             Session::forget('pending_order_id');
-            // 
+// Optionally, you can log the cancellation or notify the user
         }
     }
 }
