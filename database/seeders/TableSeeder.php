@@ -13,12 +13,16 @@ class TableSeeder extends Seeder
      */
     public function run(): void
     {
+      
+
         DB::table('tables')->insert([
-            ['name' => 'Meja 1', 'status' => 'available'],
-            ['name' => 'Meja 2', 'status' => 'available'],
-            ['name' => 'Meja 3', 'status' => 'available'],
-            ['name' => 'Meja 4', 'status' => 'available'],
-            ['name' => 'Meja 5', 'status' => 'available'],
+            ['name' => 'M01', 'status' => 'available'],
+            ['name' => 'M02', 'status' => 'available'],
+            ['name' => 'M03', 'status' => 'available'],
+            ['name' => 'M04', 'status' => 'available'],
+            ['name' => 'M05', 'status' => 'available'],
+            ['name' => 'Bar 1', 'status' => 'available'],
+            ['name' => 'Bar 2', 'status' => 'available'],
         ]);
     }
 }

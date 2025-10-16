@@ -1,149 +1,306 @@
 @extends('layouts.customer')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="text-center mb-12 relative">
-            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full"></div>
-            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">Our Culinary Delights</h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Savor our chef's masterpieces, crafted with passion and the finest ingredients</p>
-            
-            <!-- Decorative elements -->
+    <div class="container mx-auto px-4 py-12">
+
+        {{-- BAGIAN HEADER DENGAN TEMA GELAP --}}
+        <div class="text-center mb-16 relative">
+            <div
+                class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full">
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
+                Menu Pilihan Kami
+            </h1>
+            <p class="text-lg text-zinc-400 max-w-2xl mx-auto">Nikmati mahakarya dari dapur kami, dibuat dengan
+                bahan-bahan terbaik dan penuh cinta.</p>
+
             <div class="flex justify-center mt-6 space-x-2">
-                <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <div class="w-2 h-2 bg-purple-400 rounded-full"></div>
-                <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div class="w-2 h-2 bg-amber-400 rounded-full"></div>
+                <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <div class="w-2 h-2 bg-amber-400 rounded-full"></div>
             </div>
         </div>
+        
+        {{-- ====================================================================== --}}
+        {{-- BAGIAN BEST SELLER BARU (Horizontal Scroll & Placeholder) --}}
+        <div class="mb-16">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-amber-400" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zM8 12c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm3-4.47l-1.04 2.11L8 12.5h2.5L12 15.5l1.5-3h2.5l-2.96-1.86L13 7.53z"/></svg>
+                    Menu Paling Laris (Best Seller)
+                </h2>
+                <span class="text-sm text-zinc-400 hidden sm:block">Lihat 10 menu terlaris bulan ini</span>
+            </div>
 
-        <!-- Menu Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            @foreach ($menus as $menu)
-                <div class="group bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border border-gray-100">
-                    <!-- Image Container with Overlay -->
-                    <div class="relative overflow-hidden h-56">
-                        <img 
-                            src="{{ $menu->image ? asset($menu->image) : 'https://via.placeholder.com/400x250.png?text=No+Image' }}" 
-                            alt="{{ $menu->name }}"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        >
-                        <!-- Gradient Overlay -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        
-                        <!-- Price Badge -->
-                        <div class="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-bold px-3 py-2 rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
-                            Rp{{ number_format($menu->price, 2, ',', '.') }}
-                        </div>
-                        
-                        <!-- Category Badge (if available) -->
-                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">
-                            {{ $menu->category ?? 'Main Course' }}
-                        </div>
-                    </div>
-                    
-                    <!-- Content Container -->
-                    <div class="p-6 relative">
-                        <!-- Favorite Icon -->
-                        <button class="absolute -top-5 right-6 bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-red-500 transition-all duration-300 hover:scale-110 group-hover:shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                        </button>
-                        
-                        <div class="mb-4">
-                            <h2 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">{{ $menu->name }}</h2>
+            {{-- Container untuk Horizontal Scrolling --}}
+            <div class="flex space-x-6 overflow-x-scroll pb-4 custom-scrollbar">
+                
+                @if(isset($bestSellers) && $bestSellers->count() > 0)
+                    {{-- Loop data Best Seller jika ada --}}
+                    @foreach ($bestSellers as $menu)
+                        {{-- KARTU BEST SELLER --}}
+                        <div 
+                            class="flex-shrink-0 w-64 bg-zinc-800 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-amber-500/30 hover:scale-[1.02] border border-zinc-700 hover:border-amber-500"
+                            data-menu-id="{{ $menu->id }}">
                             
-                            <!-- Rating Stars (placeholder) -->
-                            <div class="flex items-center mb-3">
-                                <div class="flex text-yellow-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
+                            <div class="relative h-32 overflow-hidden">
+                                <img 
+                                    src="{{ strpos($menu->image, '/') !== false && !\Illuminate\Support\Str::contains($menu->image, 'menu_images/') ? asset($menu->image) : ($menu->image ? asset('storage/' . $menu->image) : 'https://via.placeholder.com/400x250.png?text=No+Image') }}"
+                                    alt="{{ $menu->name }}"
+                                    class="w-full h-full object-cover">
+                                
+                                <div class="absolute bottom-2 left-2 bg-amber-400 text-zinc-900 text-xs font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                    Terjual: {{ $menu->total_sold }}
                                 </div>
-                                <span class="text-xs text-gray-500 ml-1">(24)</span>
                             </div>
-                            
-                            <p class="text-gray-600 text-sm line-clamp-2 leading-relaxed">{{ $menu->description }}</p>
+
+                            <div class="p-3">
+                                <h3 class="text-lg font-bold text-zinc-100 truncate">{{ $menu->name }}</h3>
+                                <p class="text-amber-400 text-sm font-extrabold mt-1">Rp{{ number_format($menu->price, 0, ',', '.') }}</p>
+                                <p class="text-zinc-400 text-xs line-clamp-1 mt-1">{{ $menu->description }}</p>
+
+                                <form action="{{ route('customer.cart.add') }}" method="POST" class="add-to-cart-form mt-3">
+                                    @csrf
+                                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                                    <button type="submit"
+                                        class="w-full bg-amber-400 text-zinc-900 text-sm px-4 py-2 rounded-lg font-bold hover:bg-amber-300 transition-all">
+                                        Pesan
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        
-                        <form action="{{ route('customer.cart.add') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="menu_id" value="{{ $menu->id }}">
-                            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                <span>Add to Cart</span>
-                            </button>
-                        </form>
+                    @endforeach
+                @else
+                    {{-- KARTU PLACEHOLDER KETIKA DATA KOSONG --}}
+                    <div class="flex flex-col items-center justify-center w-full bg-zinc-900/50 p-10 rounded-2xl border-2 border-dashed border-amber-400/50 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-amber-500 mb-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.376ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                        <p class="text-lg font-semibold text-amber-300">Belum Ada Best Seller</p>
+                        <p class="text-sm text-zinc-400 text-center mt-1">Lariskan pesanan Anda! Menu terlaris akan muncul di sini.</p>
                     </div>
-                </div>
+                @endif
+            </div>
+        </div>
+        
+        {{-- Sisipkan custom CSS untuk menghilangkan scrollbar default --}}
+        <style>
+        /* ... (CSS custom-scrollbar tetap sama) ... */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 4px; /* Tinggi scrollbar horizontal */
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #f59e0b; /* Warna amber-500 */
+            border-radius: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #4b5563; /* Warna zinc-600 */
+        }
+        </style>
+        {{-- ====================================================================== --}}
+
+
+        {{-- FILTER KATEGORI DENGAN TEMA GELAP (Dibuat Sticky) --}}
+        <div class="mb-10 flex flex-wrap justify-center gap-3 p-3 bg-zinc-900/90 backdrop-blur-sm rounded-xl sticky top-[68px] z-30 border border-amber-400/20 shadow-xl"
+            id="category-tabs">
+            
+            <button data-category="all"
+                class="category-tab px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 text-zinc-300 hover:bg-zinc-700">
+                Semua Menu
+            </button>
+            @foreach ($groupedMenus as $categoryName => $menus)
+                <button data-category="{{ \Illuminate\Support\Str::slug($categoryName) }}"
+                    class="category-tab px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 text-zinc-300 hover:bg-zinc-700">
+                    {{ $categoryName }}
+                </button>
             @endforeach
         </div>
-        
-        <!-- Empty State (if needed) -->
-        @if(count($menus) === 0)
-            <div class="text-center py-16">
-                <div class="inline-block p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-full mb-4 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
+
+        {{-- Loop utama untuk KATEGORI --}}
+        @foreach ($groupedMenus as $categoryName => $menus)
+            <div class="mb-16 category-section" id="section-{{ \Illuminate\Support\Str::slug($categoryName) }}">
+                <h2 class="text-3xl font-extrabold text-white mb-8 border-b-2 border-amber-500/50 pb-3">
+                    {{ $categoryName }}
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {{-- Loop kedua untuk MENU di dalam kategori --}}
+                    @foreach ($menus as $menu)
+                        {{-- KARTU MENU DENGAN TEMA GELAP --}}
+                        <div
+                            class="group bg-zinc-800 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-amber-500/30 hover:-translate-y-2 border border-zinc-700 hover:border-amber-500">
+                            <div class="relative overflow-hidden h-56">
+                                <img 
+                                    src="{{ strpos($menu->image, '/') !== false && !\Illuminate\Support\Str::contains($menu->image, 'menu_images/') ? asset($menu->image) : ($menu->image ? asset('storage/' . $menu->image) : 'https://via.placeholder.com/400x250.png?text=No+Image') }}"
+                                    alt="{{ $menu->name }}"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                                {{-- Harga diubah ke amber --}}
+                                <div class="absolute top-4 right-4 bg-amber-400 text-zinc-900 text-sm font-bold px-3 py-1 rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+                                    Rp{{ number_format($menu->price, 0, ',', '.') }}
+                                </div>
+
+                                {{-- Kategori diubah ke tema gelap --}}
+                                <div class="absolute top-4 left-4 bg-zinc-900/50 backdrop-blur-sm text-zinc-200 text-xs font-semibold px-2 py-1 rounded-full">
+                                    {{ $menu->category->name ?? 'Lain-lain' }}
+                                </div>
+                            </div>
+
+                            <div class="p-5 relative">
+                                {{-- Tombol Favorite diubah ke tema gelap --}}
+                                <button
+                                    class="absolute -top-5 right-6 bg-zinc-700 p-2 rounded-full shadow-md text-zinc-400 hover:text-red-500 transition-all duration-300 hover:scale-110 hover:bg-zinc-600 group-hover:shadow-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+
+                                <div class="mb-4 h-24">
+                                    {{-- Nama Menu diubah ke amber saat hover --}}
+                                    <h2 class="text-xl font-bold text-zinc-100 mb-2 group-hover:text-amber-400 transition-colors truncate">
+                                        {{ $menu->name }}</h2>
+                                    <p class="text-zinc-400 text-sm line-clamp-3 leading-relaxed">{{ $menu->description }}</p>
+                                </div>
+
+                                <form action="{{ route('customer.cart.add') }}" method="POST" class="add-to-cart-form">
+                                    @csrf
+                                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                                    {{-- Tombol Pesan diubah ke amber --}}
+                                    <button type="submit"
+                                        class="w-full flex items-center justify-center gap-2 bg-amber-400 text-zinc-900 px-6 py-3 rounded-xl font-bold hover:bg-amber-300 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        <span>Pesan</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                <h3 class="text-2xl font-semibold text-gray-700 mb-2">Menu Coming Soon</h3>
-                <p class="text-gray-500 max-w-md mx-auto">Our chefs are crafting something special. Check back soon for our delicious offerings!</p>
-                <button class="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-600 hover:to-purple-600 transition-all shadow-md">
-                    Notify Me When Ready
-                </button>
+            </div>
+        @endforeach
+
+        @if (count($groupedMenus) === 0)
+            <div class="text-center py-16">
+                <h3 class="text-2xl font-bold text-white">Oops! Menu belum tersedia.</h3>
+                <p class="text-zinc-400 mt-2">Silakan kembali lagi nanti untuk melihat hidangan lezat kami.</p>
             </div>
         @endif
-        
-        <!-- Floating Action Button (for larger screens) -->
-        <div class="fixed bottom-8 right-8 z-10 hidden lg:block">
-            <button class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-            </button>
-        </div>
+
     </div>
 
-    <style>
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        /* Custom scrollbar for webkit browsers */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #2563eb, #7c3aed);
-        }
-    </style>
+    {{-- SCRIPT DENGAN JAVASCRIPT ANDA (TIDAK ADA PERUBAHAN FUNGSI) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getCsrfToken = () => {
+                return document.querySelector('meta[name="csrf-token"]')?.content || '';
+            };
+
+            const tabs = document.querySelectorAll('.category-tab');
+            const sections = document.querySelectorAll('.category-section');
+
+            const filterMenus = (categorySlug) => {
+                // Reset semua tab ke style TIDAK AKTIF (tema gelap)
+                tabs.forEach(t => {
+                    t.classList.remove('bg-amber-400', 'text-zinc-900', 'shadow-lg'); 
+                    t.classList.add('text-zinc-300', 'hover:bg-zinc-700'); 
+                });
+
+                sections.forEach(s => s.style.display = 'none');
+
+                const setActiveTab = (selector) => {
+                    const activeTab = document.querySelector(selector);
+                    if (activeTab) {
+                        // Style AKTIF diubah ke amber-400/zinc-900
+                        activeTab.classList.remove('text-zinc-300', 'hover:bg-zinc-700');
+                        activeTab.classList.add('bg-amber-400', 'text-zinc-900', 'shadow-lg');
+                    }
+                };
+
+                if (categorySlug === 'all') {
+                    sections.forEach(s => s.style.display = 'block');
+                    setActiveTab('[data-category="all"]');
+                } else {
+                    const targetSection = document.getElementById(`section-${categorySlug}`);
+                    if (targetSection) {
+                        targetSection.style.display = 'block';
+                        setActiveTab(`[data-category="${categorySlug}"]`);
+                    }
+                }
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    filterMenus(tab.dataset.category);
+                });
+            });
+
+            // Inisialisasi filter
+            filterMenus('all');
+
+            // --- Logika AJAX Add to Cart (TIDAK ADA PERUBAHAN FUNGSI) ---
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const csrfToken = getCsrfToken();
+                    const menuId = form.querySelector('input[name="menu_id"]').value;
+
+                    if (!csrfToken) {
+                        alert("Token keamanan hilang/kadaluarsa. Harap muat ulang halaman.");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({ menu_id: menuId }),
+                            credentials: 'same-origin'
+                        });
+
+                        if (response.status === 419) {
+                            alert("Sesi keamanan telah kadaluarsa. Halaman akan dimuat ulang.");
+                            window.location.reload();
+                            return;
+                        }
+
+                        if (!response.ok) {
+                            throw new Error('Permintaan gagal dengan status ' + response.status);
+                        }
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.textContent = data.cart_count;
+                                cartCountElement.classList.add('scale-150');
+                                setTimeout(() => {
+                                    cartCountElement.classList.remove('scale-150');
+                                }, 300);
+                            }
+                            console.log(data.message);
+                        } else {
+                            alert(data.message || 'Gagal menambahkan ke keranjang.');
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                        if (error instanceof SyntaxError) {
+                            alert("Terjadi kesalahan sistem (respons tidak terduga). Harap hubungi administrator.");
+                        } else {
+                            alert('Terjadi kesalahan koneksi. Silakan coba lagi.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

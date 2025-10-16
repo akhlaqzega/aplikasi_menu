@@ -1,18 +1,37 @@
 @extends('layouts.customer')
 
 @section('content')
-    <div class="container mx-auto px-4 text-center">
-        <div class="bg-white rounded-lg shadow-lg p-8 max-w-xl mx-auto">
-            <h1 class="text-4xl font-bold text-green-600 mb-4">Pembayaran Berhasil!</h1>
-            <p class="text-gray-700 mb-6">
-                Pesanan Anda dengan nomor **#{{ $order->id }}** telah dikonfirmasi.
+    <div class="container mx-auto px-4 py-20 text-center">
+        {{-- Card disesuaikan dengan tema gelap (bg-zinc-800) dan border amber --}}
+        <div class="bg-zinc-800 rounded-xl shadow-2xl p-10 max-w-xl mx-auto border border-amber-400/20">
+
+            {{-- Ikon Sukses disesuaikan dengan warna amber --}}
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-amber-400/20 mb-6">
+                {{-- Menggunakan Font Awesome untuk konsistensi ikon --}}
+                <i class="fas fa-check-circle h-10 w-10 text-amber-400"></i>
+            </div>
+
+            {{-- Judul dan Teks disesuaikan --}}
+            <h1 class="text-4xl font-extrabold text-amber-400 mb-4">Pembayaran Berhasil!</h1>
+
+            <p class="text-zinc-300 mb-6 text-lg">
+                Pesanan Anda dengan nomor <strong class="text-white">#{{ $order->id }}</strong> telah dikonfirmasi.
             </p>
-            <p class="text-xl font-semibold text-gray-700 mb-4">
-                Pesanan Anda akan segera diproses dan diantarkan. Harap menunggu.
+
+            <p class="text-xl text-zinc-200 mb-8">
+                Pesanan Anda sedang kami siapkan. Terima kasih!
             </p>
+
+            {{-- Tombol disesuaikan ke amber-400 dengan teks zinc-900 --}}
             <a href="{{ route('customer.menu.index') }}"
-               class="inline-block bg-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-700 transition">
-                Kembali ke Menu
+                class="inline-block bg-amber-400 text-zinc-900 px-8 py-3 rounded-full font-bold hover:bg-amber-300 transition-transform transform hover:scale-105 shadow-lg shadow-amber-500/30">
+                Pesan Lagi
+            </a>
+
+            {{-- Tambahkan link untuk melacak pesanan (opsional, tapi bagus untuk UX) --}}
+            <a href="{{ route('customer.track.index') }}"
+                class="inline-block mt-4 text-zinc-400 hover:text-amber-400 transition ml-4">
+                Lacak Pesanan Saya &rarr;
             </a>
         </div>
     </div>

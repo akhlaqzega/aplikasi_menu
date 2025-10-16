@@ -9,21 +9,21 @@ use App\Models\Payment;
 use App\Models\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use App\Jobs\CancelOrderJob;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    /**
-     * Menambahkan item ke keranjang (session).
-     */
+    const ORDER_TIMEOUT_SECONDS = 15;
+
     public function addToCart(Request $request)
     {
         $menu = Menu::find($request->input('menu_id'));
         if (!$menu) {
-            return redirect()->back()->with('error', 'Menu tidak ditemukan.');
+            return response()->json(['success' => false, 'message' => 'Menu tidak ditemukan.'], 404);
         }
 
         $cart = Session::get('cart', []);
+
         if (isset($cart[$menu->id])) {
             $cart[$menu->id]['quantity']++;
         } else {
@@ -35,22 +35,28 @@ class OrderController extends Controller
                 "image" => $menu->image,
             ];
         }
+
         Session::put('cart', $cart);
-        return redirect()->back()->with('success', 'Menu berhasil ditambahkan ke keranjang!');
+
+        // LOGIKA BARU: Hitung TOTAL KUANTITAS (jumlah semua item)
+        $totalQuantity = 0;
+        foreach ($cart as $item) {
+            $totalQuantity += $item['quantity'];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Menu berhasil ditambahkan ke keranjang!',
+            'cart_count' => $totalQuantity // Mengirim total kuantitas
+        ]);
     }
 
-    /**
-     * Menampilkan halaman keranjang.
-     */
     public function cart()
     {
         $cart = Session::get('cart', []);
         return view('customer.cart', compact('cart'));
     }
 
-    /**
-     * Memperbarui jumlah item di keranjang melalui AJAX.
-     */
     public function updateCart(Request $request)
     {
         $request->validate([
@@ -71,13 +77,11 @@ class OrderController extends Controller
         }
         Session::put('cart', $cart);
 
-        // Menghitung ulang total harga
         $total_price = 0;
         foreach ($cart as $item) {
             $total_price += $item['price'] * $item['quantity'];
         }
 
-        // Mengembalikan respons JSON untuk JavaScript
         return response()->json([
             'success' => true,
             'cart' => $cart,
@@ -85,9 +89,6 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Menghapus item dari keranjang.
-     */
     public function removeFromCart(Request $request)
     {
         $menu_id = $request->input('menu_id');
@@ -101,9 +102,6 @@ class OrderController extends Controller
         return redirect()->back()->with('error', 'Menu tidak ditemukan di keranjang.');
     }
 
-    /**
-     * Menampilkan halaman checkout.
-     */
     public function checkout()
     {
         $cart = Session::get('cart');
@@ -111,21 +109,22 @@ class OrderController extends Controller
             return redirect()->route('customer.menu.index')->with('error', 'Keranjang Anda kosong, tidak bisa melanjutkan ke checkout.');
         }
 
-        // Ambil semua meja yang tersedia atau semua meja (tergantung kebutuhan)
-        $tables = Table::all();
+        // REVISI: Mengambil data meja diurutkan berdasarkan nama (M01, M02, dsb.)
+        $tables = Table::orderBy('name')->get();
         return view('customer.checkout', compact('tables'));
     }
 
-    /**
-     * Menyimpan pesanan ke database.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
-            'table_id' => 'required|exists:tables,id',
+            'phone_number' => 'required|string|max:15',
+            'table_name' => 'required|string|exists:tables,name',
             'notes' => 'nullable|string',
-            'payment_method' => 'required|string|in:cash,online',
+            'payment_method_type' => 'required|string|in:cash,online',
+            'payment_method_detail' => 'required_if:payment_method_type,online|nullable|string',
+        ], [
+            'table_name.exists' => 'Kode meja tidak valid atau tidak terdaftar.'
         ]);
 
         $cart = Session::get('cart', []);
@@ -133,17 +132,35 @@ class OrderController extends Controller
             return redirect()->route('customer.menu.index')->with('error', 'Keranjang Anda kosong.');
         }
 
+        $table = Table::where('name', $request->input('table_name'))->first();
+
+        if (!$table) {
+            // Secara teknis, validasi di atas sudah mencakup ini, tapi ini adalah pengamanan ekstra
+            return redirect()->back()->withInput()->with('error', 'Meja tidak ditemukan.');
+        }
+
+        if ($table->status === 'occupied') {
+            return redirect()->back()->withInput()->with('table_error', 'Meja ' . $table->name . ' sedang terisi. Harap periksa kode meja Anda atau tunggu meja tersebut selesai digunakan.');
+        }
+
         $total_price = 0;
         foreach ($cart as $item) {
             $total_price += $item['price'] * $item['quantity'];
         }
 
+        $isCash = $request->input('payment_method_type') === 'cash';
+
+        $orderStatus = $isCash ? 'pending' : 'processing';
+        $paymentMethod = $isCash ? 'cash' : $request->input('payment_method_detail');
+        $paymentStatus = $isCash ? 'unpaid' : 'paid';
+
         $order = Order::create([
             'customer_name' => $request->input('customer_name'),
-            'table_id' => $request->input('table_id'),
+            'phone_number' => $request->input('phone_number'),
+            'table_id' => $table->id,
             'order_type' => 'dine_in',
             'total_price' => $total_price,
-            'status' => 'pending',
+            'status' => $orderStatus,
             'notes' => $request->input('notes'),
         ]);
 
@@ -156,46 +173,66 @@ class OrderController extends Controller
             ]);
         }
 
-        // Simpan ID pesanan di session untuk navigasi pelanggan
-        Session::put('pending_order_id', $order->id);
-
         Payment::create([
             'order_id' => $order->id,
             'amount' => $order->total_price,
-            'method' => $request->input('payment_method'),
-            'status' => 'unpaid'
+            'method' => $paymentMethod,
+            'status' => $paymentStatus
         ]);
 
-        if ($request->input('payment_method') === 'cash') {
-            // Dispatch job pembatalan dengan penundaan 5 menit
-            CancelOrderJob::dispatch($order)->delay(now()->addSeconds(15));
+        $table->update(['status' => 'occupied']);
+
+        Session::put('pending_order_id', $order->id);
+        Session::forget('cart');
+
+        if ($isCash) {
             return redirect()->route('customer.payment.cash', ['order' => $order->id]);
         } else {
-            // Untuk pembayaran online, kosongkan keranjang dan id pending
-            Session::forget('cart');
             Session::forget('pending_order_id');
-            return redirect()->route('customer.menu.index')->with('success', 'Silakan lanjutkan pembayaran online Anda.');
+            return redirect()->route('customer.order.confirmed', ['order' => $order->id]);
         }
     }
 
-    /**
-     * Menampilkan halaman instruksi pembayaran tunai.
-     */
-   public function cashInstructions(Order $order)
+    public function cashInstructions(Order $order)
     {
-        $payment = $order->payment;
-        // Periksa jika pesanan sudah selesai
-        if ($order->status === 'completed') {
-            // Hapus session dan tampilkan halaman konfirmasi
-            Session::forget('pending_order_id');
-            return view('customer.order-confirmed', compact('order'));
-        }
-        
-        // Periksa jika pesanan dibatalkan atau tidak valid
-        if ($order->status !== 'pending' || !$payment || $payment->method !== 'cash') {
-            return redirect()->route('customer.menu.index')->with('error', 'Pesanan tidak valid atau sudah diproses.');
+        $timeoutSeconds = self::ORDER_TIMEOUT_SECONDS;
+
+        $expirationTime = $order->created_at->copy()->addSeconds($timeoutSeconds);
+
+        if ($order->status === 'pending' && $expirationTime->isPast()) {
+            $order->status = 'canceled';
+            $order->save();
+            \Illuminate\Support\Facades\Session::forget('pending_order_id');
         }
 
-        return view('customer.payment-cash-instructions', compact('order'));
+        if ($order->status === 'processing' || $order->status === 'delivering' || $order->status === 'completed') {
+            \Illuminate\Support\Facades\Session::forget('pending_order_id');
+            return view('customer.order-confirmed', compact('order'));
+        }
+
+        if ($order->status === 'pending' || $order->status === 'canceled') {
+            $expirationTimestamp = $expirationTime->timestamp * 1000;
+            return view('customer.payment-cash-instructions', compact('order', 'expirationTimestamp'));
+        }
+
+        return redirect()->route('customer.menu.index')->with('error', 'Pesanan tidak valid atau tidak ditemukan.');
+    }
+
+    public function showTrackForm()
+    {
+        return view('customer.track');
+    }
+
+    public function trackOrder(Request $request)
+    {
+        $request->validate([
+            'phone_number' => 'required|string|max:15',
+        ]);
+
+        $order = Order::where('phone_number', $request->phone_number)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return view('customer.track', compact('order'));
     }
 }
