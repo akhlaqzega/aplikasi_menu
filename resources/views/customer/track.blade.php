@@ -53,7 +53,7 @@
                         {{-- Card status disesuaikan --}}
                         <div class="p-4 rounded-lg border-2 border-{{ $status_color }}-500 bg-{{ $status_bg }}">
                             
-                            <p class="text-sm font-medium text-zinc-400">Nomor Pesanan: <span class="font-bold text-white">#{{ $order->id }}</span></p>
+                            <p class="text-sm font-medium text-zinc-400">Nomor Pesanan: <span class="font-bold text-white">#{{ $order->order_number }}</span></p>
                             
                             <p class="text-lg font-bold mt-2 text-{{ $status_text }}">
                                 {{ strtoupper($order->status) }}

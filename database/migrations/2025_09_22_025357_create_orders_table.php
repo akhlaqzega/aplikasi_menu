@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('table_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('order_number', 12)->unique();
             $table->string('customer_name')->nullable();
-            $table->string('phone_number')->nullable(); 
+            $table->string('phone_number')->nullable();
             $table->string('order_type')->default('dine_in'); // dine_in, take_away
             $table->decimal('total_price', 10, 2)->default(0);
             $table->string('status')->default('pending'); // pending, processing, completed, canceled

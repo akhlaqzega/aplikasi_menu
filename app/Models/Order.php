@@ -12,7 +12,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['table_id', 'customer_name', 'phone_number','order_type', 'total_price', 'status', 'notes'];
+    protected $fillable = ['order_number','table_id', 'customer_name', 'phone_number','order_type', 'total_price', 'status', 'notes'];
 
     /**
      * Get the table that owns the order.

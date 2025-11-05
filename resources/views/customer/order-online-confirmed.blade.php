@@ -15,7 +15,7 @@
             <h1 class="text-4xl font-extrabold text-amber-400 mb-4">Pembayaran Berhasil!</h1>
 
             <p class="text-zinc-300 mb-6 text-lg">
-                Pesanan Anda dengan nomor <strong class="text-white">#{{ $order->id }}</strong> telah dikonfirmasi.
+                Pesanan Anda dengan nomor <strong class="text-white">#{{ $order->order_number }}</strong> telah dikonfirmasi.
             </p>
 
             <p class="text-xl text-zinc-200 mb-8">
@@ -25,14 +25,9 @@
             {{-- Tombol disesuaikan ke amber-400 dengan teks zinc-900 --}}
             <a href="{{ route('customer.menu.index') }}"
                 class="inline-block bg-amber-400 text-zinc-900 px-8 py-3 rounded-full font-bold hover:bg-amber-300 transition-transform transform hover:scale-105 shadow-lg shadow-amber-500/30">
-                Pesan Lagi
+                Kembali ke Menu
             </a>
 
-            {{-- Tambahkan link untuk melacak pesanan (opsional, tapi bagus untuk UX) --}}
-            <a href="{{ route('customer.track.index') }}"
-                class="inline-block mt-4 text-zinc-400 hover:text-amber-400 transition ml-4">
-                Lacak Pesanan Saya &rarr;
-            </a>
         </div>
     </div>
 @endsection

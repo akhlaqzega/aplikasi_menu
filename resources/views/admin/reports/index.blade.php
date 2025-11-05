@@ -5,151 +5,138 @@
 @section('content')
 
     <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-8x1 mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-8 text-gray-900">
-                    <h1 class="text-3xl font-bold text-blue-800 mb-6 border-b pb-2">Laporan Pendapatan & Kinerja Pesanan</h1>
+                    {{-- Header Laporan --}}
+                    <h1 class="text-3xl font-bold text-purple-600 mb-6 border-b-2 border-purple-200 pb-2">
+                        <i class="fas fa-chart-bar mr-2"></i> Laporan Detail Transaksi
+                    </h1>
 
-                    {{-- Form Filter Tanggal --}}
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg shadow-inner">
-                        <form action="{{ route('admin.reports.index') }}" method="GET" class="flex items-end space-x-4 mb-4">
+                    {{-- Filter Section --}}
+                    <div class="mb-6 p-6 bg-purple-50 rounded-lg shadow-inner border border-purple-200 print:hidden">
+                        <form id="filter-form" action="{{ route('admin.reports.index') }}" method="GET"
+                            class="flex items-end space-x-4 mb-4">
                             <div>
-                                <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
+                                <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal
+                                    Mulai</label>
                                 <input type="date" name="start_date" id="start_date" value="{{ $startDate ?? '' }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
                             </div>
                             <div>
                                 <label for="end_date" class="block text-sm font-medium text-gray-700">Tanggal Akhir</label>
                                 <input type="date" name="end_date" id="end_date" value="{{ $endDate ?? '' }}"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
                             </div>
+                            {{-- Tombol Filter --}}
                             <button type="submit"
-                                class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                Filter Laporan
+                                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                <i class="fas fa-filter mr-2"></i> Filter Laporan
                             </button>
                         </form>
 
-                        <button type="button" onclick="window.print()"
-                            class="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            Cetak Laporan
+                        {{-- Tombol Unduh PDF BARU --}}
+                        <button type="button" id="download-pdf-btn"
+                            class="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2">
+                            <i class="fas fa-file-pdf mr-2 text-red-600"></i> Unduh Laporan PDF
                         </button>
-                        <p class="mt-2 text-xs text-gray-500">Laporan untuk periode:
+
+                        {{-- Tombol Cetak Biasa --}}
+                        <button type="button" onclick="window.print()"
+                            class="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2">
+                            <i class="fas fa-print mr-2"></i> Cetak Laporan (Printer)
+                        </button>
+
+                        <p class="mt-4 text-sm text-purple-800 font-semibold">Laporan untuk periode:
                             **{{ \Carbon\Carbon::parse($startDate)->format('d F Y') }}** hingga
                             **{{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}**</p>
                     </div>
 
-                    {{-- Ringkasan Kinerja (Cards) --}}
-                    
-                    {{-- BARIS 1: METRIK KEUANGAN UTAMA (Lebih Besar) --}}
-                    <div class="grid grid-cols-1 mb-8">
-                        {{-- CARD 1: Total Pendapatan --}}
-                        <div class="bg-white p-6 rounded-xl shadow-2xl border-l-4 border-green-600">
-                            <p class="text-lg font-medium text-gray-500">TOTAL PENDAPATAN BERSIH</p>
-                            <p class="text-5xl font-extrabold text-green-700 mt-2">
-                                Rp{{ number_format($summary['total_revenue'] ?? 0, 0, ',', '.') }}
-                            </p>
-                            <p class="text-sm text-gray-500 mt-2">*Dari semua pesanan yang berstatus 'completed'</p>
-                        </div>
-                    </div>
 
-                    {{-- BARIS 2: METRIK KINERJA PESANAN (Grid 3 Kolom) --}}
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 pt-4 border-t">Ringkasan Kinerja Pesanan</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                        
-                        {{-- CARD 2: Total Pesanan Masuk --}}
-                        <div class="bg-white p-5 rounded-xl shadow-lg border-l-4 border-yellow-500">
-                            <p class="text-sm font-medium text-gray-500">Total Pesanan Masuk</p>
-                            <p class="text-3xl font-extrabold text-yellow-600 mt-1">
-                                {{ number_format($summary['total_orders'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-
-                        {{-- CARD 3: Pesanan Berhasil --}}
-                        <div class="bg-white p-5 rounded-xl shadow-lg border-l-4 border-blue-500">
-                            <p class="text-sm font-medium text-gray-500">Pesanan Berhasil Diselesaikan</p>
-                            <p class="text-3xl font-extrabold text-blue-600 mt-1">
-                                {{ number_format($summary['total_completed'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-
-                        {{-- CARD 4: Pesanan Dibatalkan --}}
-                        <div class="bg-white p-5 rounded-xl shadow-lg border-l-4 border-red-500">
-                            <p class="text-sm font-medium text-gray-500">Pesanan Dibatalkan</p>
-                            <p class="text-3xl font-extrabold text-red-600 mt-1">
-                                {{ number_format($summary['total_canceled'] ?? 0, 0, ',', '.') }}
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Detail Loss dari Pembatalan --}}
-                    <div class="bg-red-50 p-4 rounded-lg border border-red-200 mb-8">
-                        <p class="text-lg font-semibold text-red-700">Potensi Kerugian dari Pembatalan:</p>
-                        <p class="text-2xl font-extrabold text-red-800 mt-1">
-                            Rp{{ number_format($summary['total_loss_canceled'] ?? 0, 0, ',', '.') }}
-                        </p>
-                        <p class="text-sm text-red-500 mt-1">*Angka ini adalah total harga dari semua pesanan yang
-                            dibatalkan pada periode ini.</p>
-                    </div>
-
-                    {{-- DETAIL SEMUA TRANSAKSI (AUDIT) --}}
                     <h2 class="text-2xl font-bold text-gray-800 pt-4 border-t mt-6">Detail Semua Pesanan Periode</h2>
-                    <div class="bg-white p-0 rounded-xl shadow-lg border">
+                    <div class="bg-white p-0 rounded-xl shadow-lg border border-gray-200">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
-                                            ID</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
-                                            Waktu Pesanan</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
-                                            Status Akhir</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-4/12">
-                                            Pelanggan / Meja</th>
-                                        <th
-                                            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">
-                                            Total Harga</th>
+                                {{-- HEADER --}}
+                                <thead class="bg-purple-100">
+                                    <tr class="text-left text-purple-800 uppercase tracking-wider text-xs">
+                                        <th class="px-6 py-3 font-bold w-1/12">No</th>
+                                        <th class="px-6 py-3 font-bold w-2/12">ID Pesanan</th>
+                                        <th class="px-6 py-3 font-bold w-2/12">Waktu Pesanan</th>
+                                        <th class="px-6 py-3 font-bold w-2/12">Status Akhir</th>
+                                        <th class="px-6 py-3 font-bold w-2/12">Pembayaran</th>
+                                        <th class="px-6 py-3 font-bold w-3/12">Pelanggan</th>
+                                        <th class="px-6 py-3 font-bold w-2/12">Meja</th>
+                                        <th class="px-6 py-3 font-bold w-2/12 text-right">Total Harga</th>
                                     </tr>
                                 </thead>
+
+                                {{-- BODY --}}
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @forelse($detailedTransactions ?? [] as $order)
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
-                                                #{{ $order->id }}</td>
+                                        <tr class="hover:bg-purple-50 transition-colors duration-150">
+                                            {{-- ID --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-500">
+                                                #{{ $order->id }}
+                                            </td>
+                                            {{-- Order Number --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
+                                                {{ $order->order_number }}
+
+                                                {{-- Waktu --}}
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                {{ $order->created_at->format('d M H:i') }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">
+                                                {{ $order->created_at->format('d M Y H:i') }}
+                                            </td>
+
+                                            {{-- Status --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
                                                 <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                @if ($order->status == 'completed') bg-green-100 text-green-800 
-                                                @elseif($order->status == 'canceled') bg-red-100 text-red-800 
-                                                @else bg-yellow-100 text-yellow-800 @endif">
+                                                    class="px-2 py-1 inline-flex text-xs font-semibold rounded-full border
+                        @if ($order->status == 'completed') bg-green-100 text-green-800 border-green-300
+                        @elseif($order->status == 'canceled')
+                            bg-red-100 text-red-800 border-red-300
+                        @else
+                            bg-yellow-100 text-yellow-800 border-yellow-300 @endif">
                                                     {{ strtoupper($order->status) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                                {{ $order->customer_name ?? 'Anonim' }} <span
-                                                    class="text-xs text-gray-500">(Meja:
-                                                    {{ $order->table->name ?? '-' }})</span>
+
+                                            {{-- Pembayaran --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                                {{ ucfirst($order->payment->method ?? 'Tunai') }}
                                             </td>
+
+                                            {{-- Pelanggan / Meja --}}
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                                {{ $order->customer_name ?? 'Anonim' }}
+                                            </td>
+
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-700">
+                                                {{ $order->table->name ?? '-' }}
+                                            </td>
+
+                                            {{-- Total --}}
                                             <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm text-right font-extrabold 
-                                                @if ($order->status == 'completed') text-green-700 @else text-gray-700 @endif">
+                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-extrabold
+                    @if ($order->status == 'completed') text-green-700
+                    @elseif($order->status == 'canceled')
+                        text-red-700
+                    @else
+                        text-gray-700 @endif">
                                                 Rp{{ number_format($order->total_price, 0, ',', '.') }}
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center py-8 text-gray-500 text-base">Tidak ada
-                                                transaksi yang tercatat pada periode ini.</td>
+                                            <td colspan="6" class="text-center py-8 bg-gray-50 text-gray-500 text-base">
+                                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                Tidak ada transaksi pada periode ini.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
 
@@ -157,4 +144,28 @@
             </div>
         </div>
     </div>
+
+    {{-- SCRIPT BARU UNTUK MENGIRIM FILTER TANGGAL KE ROUTE PDF --}}
+    <script>
+        document.getElementById('download-pdf-btn').addEventListener('click', function() {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            let url = "{{ route('admin.reports.export.pdf') }}";
+            let params = [];
+
+            if (startDate) {
+                params.push(`start_date=${startDate}`);
+            }
+            if (endDate) {
+                params.push(`end_date=${endDate}`);
+            }
+
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+
+            window.open(url, '_blank');
+        });
+    </script>
 @endsection

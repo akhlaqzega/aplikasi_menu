@@ -49,9 +49,10 @@
                                     alt="{{ $menu->name }}"
                                     class="w-full h-full object-cover">
                                 
-                                <div class="absolute bottom-2 left-2 bg-amber-400 text-zinc-900 text-xs font-bold px-2 py-0.5 rounded-full shadow-lg">
+                                {{-- BLOK YANG DIHAPUS/DIKOMENTARI: Tombol Terjual --}}
+                                {{-- <div class="absolute bottom-2 left-2 bg-amber-400 text-zinc-900 text-xs font-bold px-2 py-0.5 rounded-full shadow-lg">
                                     Terjual: {{ $menu->total_sold }}
-                                </div>
+                                </div> --}}
                             </div>
 
                             <div class="p-3">
