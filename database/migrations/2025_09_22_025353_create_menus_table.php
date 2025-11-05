@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null'); // BARIS BARU INI
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 8, 2);

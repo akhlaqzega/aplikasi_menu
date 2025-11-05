@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -20,6 +21,46 @@ class ProfileController extends Controller
             'user' => $request->user(),
         ]);
     }
+
+    public function updatePhoto(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'photo' => 'required|image|max:2048', // Maksimum 2MB
+        ]);
+
+        if ($request->hasFile('photo')) {
+            // 1. Hapus foto lama jika ada
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
+            }
+
+            // 2. Simpan foto baru ke direktori 'public/profile-photos'
+            $path = $request->file('photo')->store('profile-photos', 'public');
+
+            // 3. Update path di database
+            $user->profile_photo_path = $path;
+            $user->save();
+        }
+
+        return redirect()->route('profile.edit')->with('status', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function deletePhoto(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->profile_photo_path) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+            $user->profile_photo_path = null;
+            $user->save();
+        }
+
+        return redirect()->route('profile.edit')->with('status', 'Foto profil berhasil dihapus.');
+    }
+
+
 
     /**
      * Update the user's profile information.
